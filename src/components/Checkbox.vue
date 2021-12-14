@@ -1,15 +1,11 @@
 <template>
-  <div
-    class="box"
-    @click="$emit('update:checked', !checked)"
-    :class="{ 'is-checked': checked }"
-  >
+  <div class="box" @click="onClick" :class="{ 'is-checked': checked }">
     <div class="checkbox">
       <img src="@/assets/tick.svg" alt="tick" class="checkbox-true" />
     </div>
 
     <div></div>
-    <div class="checkbox-label">Floor Swept</div>
+    <div class="checkbox-label">{{ label }}</div>
   </div>
 </template>
 
@@ -23,9 +19,24 @@ export default defineComponent({
     NCheckbox,
   },
   props: {
-    checked: {
+    initVal: {
       type: Boolean,
       required: true,
+    },
+    label: {
+      type: String,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      checked: this.initVal,
+    }
+  },
+  methods: {
+    onClick() {
+      this.checked = !this.checked
+      this.$emit('changed', this.label, !this.checked)
     },
   },
 })
@@ -37,7 +48,7 @@ export default defineComponent({
   background: #fefefe;
   border-radius: 12px;
   width: 85%;
-  height: 25rem;
+  height: 84px;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -67,6 +78,7 @@ export default defineComponent({
   &.is-checked {
     background: $success-light;
     border: 2px solid $success;
+    box-sizing: border-box;
     border-radius: 12px;
     .checkbox {
       border: none;

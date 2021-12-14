@@ -1,8 +1,13 @@
 <template>
   <div class="main">
     <div class="container">
-      <Checkbox v-model:checked="checked"></Checkbox>
-      <div>wefe</div>
+      <Checkbox
+        v-for="i in fields.length"
+        class="form-item"
+        :label="fields[i - 1]"
+        :initVal="values[i - 1]"
+        @changed="sendRequest"
+      ></Checkbox>
     </div>
   </div>
 </template>
@@ -14,8 +19,11 @@ export default defineComponent({
   name: 'MainView',
   components: { Checkbox },
   setup() {
-    const checked = ref(false)
-    return { checked }
+    const fields = ['Floor Swept', 'Floor Swept']
+    const values = [true, false]
+    const sendRequest = (field: String, newValue: String) =>
+      console.log(field, newValue)
+    return { sendRequest, fields, values }
   },
 })
 </script>
@@ -30,12 +38,14 @@ export default defineComponent({
   background: #f6e9e6;
   box-shadow: 10px 12px 0px -1px #ebc2bb;
   border-radius: 20px;
-  width: 100px;
-  height: 100px;
   width: 100%;
   padding: 32px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  .form-item {
+    margin-bottom: 12px;
+  }
 }
 </style>
