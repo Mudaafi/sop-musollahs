@@ -1,7 +1,7 @@
 <template>
   <div class="box" @click="onClick" :class="{ 'is-checked': checked }">
     <div class="checkbox">
-      <img src="@/assets/tick.svg" alt="tick" class="checkbox-true" />
+      <img src="../assets/tick.svg" alt="tick" class="checkbox-true" />
     </div>
     <div class="checkbox-label">{{ checked ? label.slice(0, -1) : label }}</div>
   </div>
@@ -71,6 +71,7 @@ export default defineComponent({
     color: $primary-5;
     font-size: 25px;
     text-align: left;
+    line-height: 32px;
   }
 
   // Styles to apply when checked

@@ -91,7 +91,7 @@ const actions: ActionTree<State, RootState> = {
     commit,
   }: ActionContext<State, RootState>) => {
     const fields = (
-      await api.get('', {
+      await api.get('/.netlify/functions/googleapi', {
         params: {
           function: 'fields',
         } as GetDataParams,
@@ -104,7 +104,7 @@ const actions: ActionTree<State, RootState> = {
     { area }: { area: string },
   ) => {
     const values = (
-      await api.get('', {
+      await api.get('/.netlify/functions/googleapi', {
         params: {
           function: 'values',
           area: area,
@@ -117,8 +117,9 @@ const actions: ActionTree<State, RootState> = {
     commit,
   }: ActionContext<State, RootState>) => {
     console.log(import.meta.env.VITE_BACKEND_ENDPOINT)
+    console.log('hello')
     const areas = (
-      await api.get('', {
+      await api.get('/.netlify/functions/googleapi', {
         params: {
           function: 'areas',
         } as GetDataParams,
