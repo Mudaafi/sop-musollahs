@@ -9,6 +9,7 @@ import {
 } from 'vuex'
 import api from '../../api'
 import { State as RootState } from '../index'
+import { map } from 'lodash-es'
 
 export type State = {
   fields: Array<string>
@@ -32,7 +33,7 @@ const getters: GetterTree<State, RootState> = {
   [GetterType.AREA_OPTIONS]: (
     state: State,
   ): Array<{ value: string; label: string }> => {
-    return state.areas.map((area: string) => {
+    return map(state.areas).map((area: string) => {
       return { value: area, label: area }
     })
   },

@@ -19,7 +19,7 @@
         class="form-item"
         :area="area"
         :label="inputFields[i - 1]"
-        :initVal="inputs[i - 1]"
+        :initVal="inputs[i - 1] != undefined ? inputs[i - 1] : ''"
       />
     </div>
   </div>
