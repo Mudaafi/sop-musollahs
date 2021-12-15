@@ -19,8 +19,10 @@
         class="form-item"
         :area="area"
         :label="inputFields[i - 1]"
-        :initVal="inputs[i - 1] != undefined ? inputs[i - 1] : ''"
+        :initVal="inputs[i - 1] == undefined ? '' : inputs[i - 1]"
       />
+      <div class="form-item note-header">Take Note!</div>
+      <div v-for="note in notes" class="form-item note-item">{{ note }}</div>
     </div>
   </div>
 </template>
@@ -53,6 +55,7 @@ export default defineComponent({
       values: GetterType.CHECKBOX_VALUES,
       inputFields: GetterType.INPUT_FIELDS,
       inputs: GetterType.INPUT_VALUES,
+      notes: GetterType.NOTES,
     }),
     areas(): Array<{ value: string; label: string }> {
       return this.$store.getters[GetterType.AREA_OPTIONS]
@@ -103,6 +106,19 @@ export default defineComponent({
   .form-item {
     margin-bottom: 16px;
     font-weight: bold;
+    &.note-header {
+      margin-bottom: 12px;
+
+      color: $primary-5;
+      font-size: 25px;
+      line-height: 32px;
+      margin-top: 12px;
+    }
+    &.note-item {
+      width: 75%;
+      text-align: left;
+      color: black;
+    }
   }
   .area-select {
     color: $primary-5;

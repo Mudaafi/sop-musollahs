@@ -83,6 +83,13 @@ const getters: GetterTree<State, RootState> = {
     }
     return values
   },
+  [GetterType.NOTES]: (state: State): Array<string> => {
+    var values = []
+    for (var i = 0; i < state.fields.length; ++i) {
+      if (state.fields[i].endsWith('!')) values.push(state.values[i])
+    }
+    return values
+  },
 }
 
 const actions: ActionTree<State, RootState> = {

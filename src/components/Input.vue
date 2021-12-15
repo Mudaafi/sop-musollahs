@@ -42,6 +42,11 @@ export default defineComponent({
       submitted: true,
     }
   },
+  watch: {
+    initVal() {
+      this.text = this.initVal
+    },
+  },
   methods: {
     submitRequest() {
       this.submitted = false

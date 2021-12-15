@@ -21,4 +21,5 @@ export enum GetterType {
   AREA_OPTIONS = 'AREA_OPTIONS',
   INPUT_FIELDS = 'INPUT_FIELDS',
   INPUT_VALUES = 'INPUT_VALUES',
+  NOTES = 'NOTES',
 }
