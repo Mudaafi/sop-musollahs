@@ -32,7 +32,6 @@ const getters: GetterTree<State, RootState> = {
   [GetterType.AREA_OPTIONS]: (
     state: State,
   ): Array<{ value: string; label: string }> => {
-    console.log(state.areas)
     var options: Array<{ value: string; label: string }> = []
     state.areas.forEach((area: string) =>
       options.push({ value: area, label: area }),
@@ -116,8 +115,6 @@ const actions: ActionTree<State, RootState> = {
   [ActionType.FETCH_AREAS]: async ({
     commit,
   }: ActionContext<State, RootState>) => {
-    console.log(import.meta.env.VITE_BACKEND_ENDPOINT)
-    console.log('hello')
     const areas = (
       await api.get('/.netlify/functions/googleapi', {
         params: {
@@ -125,7 +122,6 @@ const actions: ActionTree<State, RootState> = {
         } as GetDataParams,
       })
     ).data
-    console.log(areas)
     commit(MutationType.UPDATE_AREAS, areas)
   },
   [ActionType.SEND_VALUE]: async (
@@ -138,7 +134,7 @@ const actions: ActionTree<State, RootState> = {
       field: field,
       data: value,
     }
-    await api.post('', params)
+    await api.post('/.netlify/functions/googleapi', params)
   },
   [ActionType.CLEAR]: ({ commit }: ActionContext<State, RootState>) => {
     commit(MutationType.CLEAR)

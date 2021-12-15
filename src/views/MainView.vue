@@ -102,6 +102,7 @@ export default defineComponent({
 
   .form-item {
     margin-bottom: 16px;
+    font-weight: bold;
   }
   .area-select {
     color: $primary-5;
