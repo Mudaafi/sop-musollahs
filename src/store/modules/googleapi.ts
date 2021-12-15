@@ -116,6 +116,7 @@ const actions: ActionTree<State, RootState> = {
   [ActionType.FETCH_AREAS]: async ({
     commit,
   }: ActionContext<State, RootState>) => {
+    console.log(import.meta.env.VITE_BACKEND_ENDPOINT)
     const areas = (
       await api.get('', {
         params: {
@@ -123,6 +124,7 @@ const actions: ActionTree<State, RootState> = {
         } as GetDataParams,
       })
     ).data
+    console.log(areas)
     commit(MutationType.UPDATE_AREAS, areas)
   },
   [ActionType.SEND_VALUE]: async (
