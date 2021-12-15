@@ -29,6 +29,13 @@ const getters: GetterTree<State, RootState> = {
   [GetterType.AREAS]: (state: State): Array<string> => {
     return state.areas
   },
+  [GetterType.AREA_OPTIONS]: (
+    state: State,
+  ): Array<{ value: string; label: string }> => {
+    return state.areas.map((area: string) => {
+      return { value: area, label: area }
+    })
+  },
   [GetterType.CHECKBOX_FIELDS]: (state: State): Array<string> => {
     var fields = []
     for (var i = 0; i < state.fields.length; ++i) {

@@ -32,7 +32,6 @@ import Input from '../components/Input.vue'
 import { ActionType, GetterType } from '../store/types'
 import { mapGetters } from 'vuex'
 import { NSelect } from 'naive-ui'
-type NSelectOption = { value: string; label: string }
 
 export default defineComponent({
   name: 'MainView',
@@ -55,10 +54,8 @@ export default defineComponent({
       inputFields: GetterType.INPUT_FIELDS,
       inputs: GetterType.INPUT_VALUES,
     }),
-    areas(): Array<NSelectOption> {
-      return this.$store.getters[GetterType.AREAS].map((area: string) => {
-        return { value: area, label: area } as NSelectOption
-      })
+    areas(): Array<{ value: string; label: string }> {
+      return this.$store.getters[GetterType.AREA_OPTIONS]
     },
   },
   methods: {
