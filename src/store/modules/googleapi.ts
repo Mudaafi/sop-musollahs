@@ -9,7 +9,6 @@ import {
 } from 'vuex'
 import api from '../../api'
 import { State as RootState } from '../index'
-import { map } from 'lodash-es'
 
 export type State = {
   fields: Array<string>
@@ -33,9 +32,12 @@ const getters: GetterTree<State, RootState> = {
   [GetterType.AREA_OPTIONS]: (
     state: State,
   ): Array<{ value: string; label: string }> => {
-    return map(state.areas).map((area: string) => {
-      return { value: area, label: area }
-    })
+    console.log(state.areas)
+    var options: Array<{ value: string; label: string }> = []
+    state.areas.forEach((area: string) =>
+      options.push({ value: area, label: area }),
+    )
+    return options
   },
   [GetterType.CHECKBOX_FIELDS]: (state: State): Array<string> => {
     var fields = []
