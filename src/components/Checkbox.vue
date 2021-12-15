@@ -3,9 +3,7 @@
     <div class="checkbox">
       <img src="@/assets/tick.svg" alt="tick" class="checkbox-true" />
     </div>
-
-    <div></div>
-    <div class="checkbox-label">{{ label }}</div>
+    <div class="checkbox-label">{{ checked ? label.slice(0, -1) : label }}</div>
   </div>
 </template>
 
@@ -36,7 +34,7 @@ export default defineComponent({
   methods: {
     onClick() {
       this.checked = !this.checked
-      this.$emit('changed', this.label, !this.checked)
+      this.$emit('changed', this.label, this.checked)
     },
   },
 })
@@ -72,6 +70,7 @@ export default defineComponent({
   .checkbox-label {
     color: $primary-5;
     font-size: 25px;
+    text-align: left;
   }
 
   // Styles to apply when checked

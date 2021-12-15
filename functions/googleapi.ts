@@ -5,7 +5,7 @@ import { GoogleApisParams, GetDataParams, PostDataParams } from './lib/types'
 const headers = {
   /* Required for CORS support to work */
   // Not required for deployment
-  'Access-Control-Allow-Origin': 'http://localhost:8080',
+  'Access-Control-Allow-Origin': 'http://localhost:3000',
   'Access-Control-Allow-Credentials': true,
   'Access-Control-Allow-Headers': 'Content-Type',
 }
@@ -63,6 +63,8 @@ async function handleGetRequests(data: GetDataParams) {
   switch (data.function) {
     case 'fields':
       return getFields()
+    case 'areas':
+      return getAreas()
     case 'values':
       if (!data.area) return 'Missing Area Parameter'
       var rowNo = await getAreaRow(data.area)
@@ -79,7 +81,7 @@ async function handleGetRequests(data: GetDataParams) {
 }
 
 // -- Abstracted Logics
-async function getAreaRow(area: string) {
+async function getAreas() {
   var rows = await getData(
     `A${AREAS_START}:A`,
     process.env.GSHEET_ID,
@@ -87,6 +89,11 @@ async function getAreaRow(area: string) {
   )
   rows = rows.filter((row) => row[0] != null && row[0] != '')
   var areas = rows.map((row: Array<String>) => row[0])
+  return areas
+}
+
+async function getAreaRow(area: string) {
+  var areas = await getAreas()
   var rowNo = areas.indexOf(area)
   return rowNo
 }

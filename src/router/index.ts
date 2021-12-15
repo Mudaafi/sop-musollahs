@@ -5,7 +5,12 @@ const router = createRouter({
   routes: [
     {
       path: '/',
+      redirect: '/EA',
+    },
+    {
+      path: '/:area',
       name: 'Main',
+      props: true,
       component: () => import('../views/MainView.vue'),
     },
   ],
