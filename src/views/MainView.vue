@@ -20,12 +20,34 @@
         :area="area"
         :label="inputFields[i - 1]"
         :initVal="inputs[i - 1] == undefined ? '' : inputs[i - 1]"
+        @updating="updated = !$event"
       />
       <div class="form-item note-header" v-if="notes.length > 0">
         Take Note!
       </div>
       <div v-for="note in notes" class="form-item note-item">{{ note }}</div>
-      <div><button @click="updateTele">Update Telegram Group</button></div>
+      <div class="submit">
+        <NInput
+          placeholder="Telegram Username"
+          class="username"
+          :class="{
+            'is-updated': updated,
+          }"
+          v-model:value="username"
+          :default-value="username"
+          @input="updateUsername"
+        >
+          <template #prefix>@</template>
+        </NInput>
+        <NButton
+          color="#cfffb9"
+          :disabled="!updated"
+          type="success"
+          class="button"
+          @click="updateTele"
+          >Update Telegram Group</NButton
+        >
+      </div>
     </div>
   </div>
 </template>
@@ -36,12 +58,12 @@ import Checkbox from '../components/Checkbox.vue'
 import Input from '../components/Input.vue'
 import { ActionType, GetterType } from '../store/types'
 import { mapGetters } from 'vuex'
-import { NSelect } from 'naive-ui'
+import { NSelect, NInput, NButton } from 'naive-ui'
 import debounce from 'lodash.debounce'
 
 export default defineComponent({
   name: 'MainView',
-  components: { Checkbox, NSelect, Input },
+  components: { Checkbox, NSelect, Input, NInput, NButton },
   props: {
     area: {
       type: String,
@@ -51,6 +73,8 @@ export default defineComponent({
   data() {
     return {
       selectedArea: this.area,
+      updated: false,
+      username: '',
     }
   },
   computed: {
@@ -59,6 +83,7 @@ export default defineComponent({
       values: GetterType.CHECKBOX_VALUES,
       inputFields: GetterType.INPUT_FIELDS,
       inputs: GetterType.INPUT_VALUES,
+      storedUsername: GetterType.TELE_USERNAME,
       notes: GetterType.NOTES,
     }),
     areas(): Array<{ value: string; label: string }> {
@@ -93,8 +118,17 @@ export default defineComponent({
         inputValues: this.inputs,
       })
     }, 1000),
+    updateUsername: debounce(function debounceUpdateUsername(this: any) {
+      this.updated = false
+      this.$store.dispatch(ActionType.TELE_RECORD_USERNAME, {
+        username: this.username,
+      })
+      this.updated = this.username.length > 0
+    }, 1000),
   },
   async mounted() {
+    this.username = this.storedUsername != null ? this.storedUsername : ''
+    this.updated = this.username.length > 0
     await this.$store.dispatch(ActionType.FETCH_AREAS)
     await this.$store.dispatch(ActionType.FETCH_FIELDS)
     await this.$store.dispatch(ActionType.FETCH_VALUES, { area: this.area })
@@ -138,6 +172,26 @@ export default defineComponent({
   .area-select {
     color: $primary-5;
     font-size: 25px;
+  }
+  .submit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .username {
+      display: block;
+      margin-bottom: 10px;
+      border-radius: 12px;
+    }
+    .button {
+      font-size: 18px;
+      border-radius: 12px;
+      color: $primary-5;
+      border: 2px solid $success;
+      //background-color: $success-light;
+    }
+    .is-updated {
+      background-color: $success-light;
+    }
   }
 }
 </style>

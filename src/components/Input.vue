@@ -50,6 +50,7 @@ export default defineComponent({
   methods: {
     submitRequest() {
       this.submitted = false
+      this.$emit('updating', true)
       this.submit()
     },
     submit: debounce(async function debounceSubmit(this: any) {
@@ -59,7 +60,8 @@ export default defineComponent({
         value: this.text,
       })
       this.submitted = true
-    }, 2500),
+      this.$emit('updating', false)
+    }, 2000),
   },
 })
 </script>

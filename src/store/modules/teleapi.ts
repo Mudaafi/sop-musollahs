@@ -65,26 +65,19 @@ const actions: ActionTree<State, RootState> = {
       message: msg,
     } as TeleApiParams)
   },
-  // [ActionType.TELE_RECORD_USERNAME]: async (
-  //   { commit }: ActionContext<State, RootState>,
-  //   { area }: { area: string },
-  // ) => {
-  //   const values = (
-  //     await api.get('/.netlify/functions/googleapi', {
-  //       params: {
-  //         function: 'telegroup',
-  //         area: area,
-  //       } as GetDataParams,
-  //     })
-  //   ).data
-  // },
+  [ActionType.TELE_RECORD_USERNAME]: async (
+    { commit }: ActionContext<State, RootState>,
+    { username }: { username: string },
+  ) => {
+    commit(MutationType.TELE_UPDATE_USERNAME, username)
+  },
 }
 
 const mutations: MutationTree<State> = {
-  [MutationType.TELE_UPDATE_USERNAME]: (
-    state: State,
-    fields: Array<string>,
-  ) => {},
+  [MutationType.TELE_UPDATE_USERNAME]: (state: State, username: string) => {
+    if (username == null) return
+    state.username = username.length > 0 ? username : ''
+  },
 }
 
 const googleapi: Module<State, RootState> = {
