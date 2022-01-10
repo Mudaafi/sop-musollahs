@@ -121,6 +121,121 @@ export async function appendToSheet(
   })
 }
 
+/**
+ * Gets the names of sheets in a given spreadsheet
+ * @param sheetID <string>
+ * @returns Array<string> of sheet names
+ */
+export async function getSheetNames(sheetID: string): Promise<Array<string>> {
+  return new Promise((res, rej) => {
+    sheets.spreadsheets.get(
+      {
+        spreadsheetId: sheetID,
+      },
+      (error, response) => {
+        if (error) {
+          console.log('The API returned an error: ' + error)
+          rej(error)
+          return
+        } else {
+          res(response.data.sheets.map((sheet) => sheet.properties.title))
+        }
+      },
+    )
+  })
+}
+
+export async function duplicateSheet(
+  spreadsheetID: string,
+  sheetID: number,
+  newSheetName?: string,
+) {
+  return new Promise((res, rej) => {
+    sheets.spreadsheets.sheets.copyTo(
+      {
+        spreadsheetId: spreadsheetID,
+        sheetId: sheetID,
+        requestBody: {
+          destinationSpreadsheetId: spreadsheetID,
+        },
+      },
+      (error, response) => {
+        if (error) {
+          console.log('The API returned an error: ' + error)
+          rej(error)
+          return
+        } else {
+          if (newSheetName) {
+            res(renameSheet(spreadsheetID, response.data.sheetId, newSheetName))
+          } else {
+            res(true)
+          }
+        }
+      },
+    )
+  })
+}
+
+export async function renameSheet(
+  spreadsheetID: string,
+  sheetID: number,
+  newSheetName: string,
+  index = 0,
+) {
+  let request: sheets_v4.Schema$Request = {
+    updateSheetProperties: {
+      fields: 'title,index',
+      properties: {
+        title: newSheetName,
+        sheetId: sheetID,
+        index: index,
+      },
+    },
+  }
+  return doBatchReq(spreadsheetID, [request])
+}
+
+/**
+ * Wrapper for batch requests
+ * @param sheetId SpreadsheetId
+ * @param requests
+ * @returns
+ */
+export async function doBatchReq(
+  sheetId: string,
+  requests: Array<sheets_v4.Schema$Request>,
+) {
+  return new Promise((res, rej) => {
+    sheets.spreadsheets.batchUpdate(
+      {
+        spreadsheetId: sheetId,
+        requestBody: {
+          requests: requests,
+        },
+      },
+      (error, response) => {
+        if (error) {
+          if (error.message.search('already exists') != -1) {
+            console.log('Add Sheet API Name Overlap')
+            rej('Exists')
+          } else if (
+            error.message.search('The caller does not have permission') != -1
+          ) {
+            console.log('GSheet Permission Error')
+            rej('Permissions')
+          } else {
+            console.log('The add sheet API returned an error: ' + error)
+            rej(error)
+          }
+          return
+        } else {
+          res(response)
+        }
+      },
+    )
+  })
+}
+
 // --- Formatting Functions
 
 function genOutputRange(sheetName: string, range: string): string {

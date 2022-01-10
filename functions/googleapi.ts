@@ -1,4 +1,9 @@
-import { getData, writeData } from './lib/gsheet-interface'
+import {
+  getData,
+  writeData,
+  getSheetNames,
+  duplicateSheet,
+} from './lib/gsheet-interface'
 import { GoogleApisParams, GetDataParams, PostDataParams } from './lib/types'
 
 // --- Http Handlers
@@ -26,7 +31,6 @@ export async function handler(event, context) {
       break
     default:
   }
-
   return {
     statusCode: 200,
     headers,
@@ -34,11 +38,11 @@ export async function handler(event, context) {
   }
 }
 
-const WINTER_SHEET_NAME = 'Winter Clean Up'
 const AREAS_START = 3
 const FIELDS_START = 'B'
 const FIELDS_ROW = 2
 async function handlePostRequests(data: PostDataParams) {
+  await createSheetIfMissing(getSheetName())
   switch (data.function) {
     case 'update':
       var rowNo = await getAreaRow(data.area)
@@ -51,7 +55,7 @@ async function handlePostRequests(data: PostDataParams) {
         `${String.fromCharCode(colNum + 2 + 64)}${rowNo + AREAS_START}`,
         data.data,
         process.env.GSHEET_ID,
-        WINTER_SHEET_NAME,
+        getSheetName(),
       )
       return true
     default:
@@ -60,6 +64,7 @@ async function handlePostRequests(data: PostDataParams) {
 }
 
 async function handleGetRequests(data: GetDataParams) {
+  await createSheetIfMissing(getSheetName())
   switch (data.function) {
     case 'fields':
       return getFields()
@@ -73,7 +78,7 @@ async function handleGetRequests(data: GetDataParams) {
       var rows = await getData(
         `${FIELDS_START}${rowNo + AREAS_START}:${rowNo + AREAS_START}`,
         process.env.GSHEET_ID,
-        WINTER_SHEET_NAME,
+        getSheetName(),
       )
       return rows[0]
     default:
@@ -85,7 +90,7 @@ async function getAreas() {
   var rows = await getData(
     `A${AREAS_START}:A`,
     process.env.GSHEET_ID,
-    WINTER_SHEET_NAME,
+    getSheetName(),
   )
   rows = rows.filter((row) => row[0] != null && row[0] != '')
   var areas = rows.map((row: Array<String>) => row[0])
@@ -102,8 +107,28 @@ async function getFields() {
   var rows = await getData(
     `${FIELDS_START}${FIELDS_ROW}:${FIELDS_ROW}`,
     process.env.GSHEET_ID,
-    WINTER_SHEET_NAME,
+    getSheetName(),
   )
   rows = rows.filter((row) => row[0] != null && row[0] != '')
   return rows[0]
+}
+
+async function createSheetIfMissing(sheetName: string) {
+  var sheets = await getSheetNames(process.env.GSHEET_ID)
+  if (!sheets.includes(sheetName)) {
+    await duplicateSheet(
+      process.env.GSHEET_ID,
+      Number(process.env.TEMPLATE_SHEET_ID),
+      sheetName,
+    )
+  }
+}
+
+// -- Abstracted Utils
+function getSheetName() {
+  const todayDate = new Date()
+  const todayMonth = todayDate.toLocaleString('default', { month: 'short' })
+  const todayYear = todayDate.getFullYear()
+  const todaySession = todayDate.getDate() <= 17 ? 1 : 2
+  return `${todayMonth} ${todayYear} [${todaySession}]`
 }
