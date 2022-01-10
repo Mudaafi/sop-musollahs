@@ -143,6 +143,7 @@ const actions: ActionTree<State, RootState> = {
       data: value,
     }
     await api.post('/.netlify/functions/googleapi', params)
+    commit(MutationType.UPDATE_VALUE, { field: field, value: value })
   },
   [ActionType.CLEAR]: ({ commit }: ActionContext<State, RootState>) => {
     commit(MutationType.CLEAR)
