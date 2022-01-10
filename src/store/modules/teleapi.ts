@@ -59,10 +59,11 @@ const actions: ActionTree<State, RootState> = {
     for (var i = 0; i < inputFields.length; ++i)
       msg = msg += `${inputFields[i]}: ${
         inputValues[i] != null ? inputValues[i] : 'NIL'
-      }\n`
-    await api.get('/.netlify/functions/teleapi', {
-      params: { groupId: groupId, message: msg } as TeleApiParams,
-    })
+      }\n\n`
+    await api.post('/.netlify/functions/teleapi', {
+      groupId: groupId,
+      message: msg,
+    } as TeleApiParams)
   },
   // [ActionType.TELE_RECORD_USERNAME]: async (
   //   { commit }: ActionContext<State, RootState>,
