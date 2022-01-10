@@ -21,7 +21,9 @@
         :label="inputFields[i - 1]"
         :initVal="inputs[i - 1] == undefined ? '' : inputs[i - 1]"
       />
-      <div class="form-item note-header">Take Note!</div>
+      <div class="form-item note-header" v-if="notes.length > 0">
+        Take Note!
+      </div>
       <div v-for="note in notes" class="form-item note-item">{{ note }}</div>
     </div>
   </div>

@@ -86,7 +86,8 @@ const getters: GetterTree<State, RootState> = {
   [GetterType.NOTES]: (state: State): Array<string> => {
     var values = []
     for (var i = 0; i < state.fields.length; ++i) {
-      if (state.fields[i].endsWith('!')) values.push(state.values[i])
+      if (state.fields[i].endsWith('!') && state.values[i] != null)
+        values.push(state.values[i])
     }
     return values
   },
