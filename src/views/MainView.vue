@@ -116,6 +116,7 @@ export default defineComponent({
         checkboxValues: this.values,
         inputFields: this.inputFields,
         inputValues: this.inputs,
+        username: this.username,
       })
     }, 1000),
     updateUsername: debounce(function debounceUpdateUsername(this: any) {

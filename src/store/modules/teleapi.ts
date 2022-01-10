@@ -33,12 +33,14 @@ const actions: ActionTree<State, RootState> = {
       checkboxValues,
       inputFields,
       inputValues,
+      username,
     }: {
       area: string
       checkboxFields: Array<string>
       checkboxValues: Array<boolean>
       inputFields: Array<string>
       inputValues: Array<string>
+      username: string
     },
   ) => {
     const groupId = (
@@ -53,7 +55,7 @@ const actions: ActionTree<State, RootState> = {
     let todayDate = `${today.getDay()} ${today.toLocaleString('default', {
       month: 'short',
     })}`
-    let msg = `<b>${area}</b>\n\nChecked by: @${state.username}\nDate checked: ${todayDate}\n`
+    let msg = `<b>${area}</b>\n\nChecked by: @${username}\nDate checked: ${todayDate}\n`
     for (var i = 0; i < checkboxFields.length; ++i)
       msg = msg + `${checkboxFields[i]}: ${checkboxValues[i] ? '✅' : '❌'}\n`
     for (var i = 0; i < inputFields.length; ++i)
