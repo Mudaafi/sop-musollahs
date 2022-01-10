@@ -25,6 +25,7 @@
         Take Note!
       </div>
       <div v-for="note in notes" class="form-item note-item">{{ note }}</div>
+      <div><button @click="updateTele">Update Telegram Group</button></div>
     </div>
   </div>
 </template>
@@ -36,6 +37,7 @@ import Input from '../components/Input.vue'
 import { ActionType, GetterType } from '../store/types'
 import { mapGetters } from 'vuex'
 import { NSelect } from 'naive-ui'
+import debounce from 'lodash.debounce'
 
 export default defineComponent({
   name: 'MainView',
@@ -80,6 +82,17 @@ export default defineComponent({
         value: value,
       })
     },
+    updateTele: debounce(async function debounceTeleUpdate(this: any) {
+      // Toast probably
+
+      await this.$store.dispatch(ActionType.TELE_UPDATE_TELEGRAM, {
+        area: this.area,
+        checkboxFields: this.fields,
+        checkboxValues: this.values,
+        inputFields: this.inputFields,
+        inputValues: this.inputs,
+      })
+    }, 1000),
   },
   async mounted() {
     await this.$store.dispatch(ActionType.FETCH_AREAS)

@@ -41,6 +41,7 @@ export async function handler(event, context) {
 const AREAS_START = 3
 const FIELDS_START = 'B'
 const FIELDS_ROW = 2
+const CONFIG_SHEET = 'Config'
 async function handlePostRequests(data: PostDataParams) {
   await createSheetIfMissing(getSheetName())
   switch (data.function) {
@@ -81,6 +82,10 @@ async function handleGetRequests(data: GetDataParams) {
         getSheetName(),
       )
       return rows[0]
+    case 'telegroup':
+      var rows = await getData('A3:B', process.env.GSHEET_ID, CONFIG_SHEET)
+      var groupId = rows.filter((row) => row[0] == data.area)[0][1]
+      return groupId
     default:
   }
 }

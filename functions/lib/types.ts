@@ -13,3 +13,8 @@ export interface PostDataParams extends GoogleApisParams {
   field: string
   area: string
 }
+
+export interface TeleApiParams {
+  message: string
+  groupId: string
+}
