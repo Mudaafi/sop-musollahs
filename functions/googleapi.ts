@@ -43,7 +43,6 @@ const FIELDS_START = 'B'
 const FIELDS_ROW = 2
 const CONFIG_SHEET = 'Config'
 async function handlePostRequests(data: PostDataParams) {
-  await createSheetIfMissing(getSheetName())
   switch (data.function) {
     case 'update':
       var rowNo = await getAreaRow(data.area)
