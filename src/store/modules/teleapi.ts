@@ -52,7 +52,7 @@ const actions: ActionTree<State, RootState> = {
       })
     ).data
     let today = new Date()
-    let todayDate = `${today.getDay()} ${today.toLocaleString('default', {
+    let todayDate = `${today.getDate()} ${today.toLocaleString('default', {
       month: 'short',
     })}`
     let msg = `<b>${area}</b>\n\nChecked by: @${username}\nDate checked: ${todayDate}\n`
