@@ -15,6 +15,8 @@ const headers = {
   'Access-Control-Allow-Headers': 'Content-Type',
 }
 
+const GSHEET_ID = process.env.GSHEET_ID || ''
+
 export async function handler(event, context) {
   var httpMethod = event.httpMethod
   let res: any = 'Api Call Complete'
@@ -42,6 +44,10 @@ const AREAS_START = 3
 const FIELDS_START = 'B'
 const FIELDS_ROW = 2
 const CONFIG_SHEET = 'Config'
+const PAST_SHEET_DATA_RANGE = 'D3:F3'
+const NEW_SHEET_DATE_CELL = 'D3'
+const NEW_SHEET_COUNTER_CELL = 'E3'
+
 async function handlePostRequests(data: PostDataParams) {
   switch (data.function) {
     case 'update':
@@ -54,8 +60,8 @@ async function handlePostRequests(data: PostDataParams) {
       await writeData(
         `${String.fromCharCode(colNum + 2 + 64)}${rowNo + AREAS_START}`,
         data.data,
-        process.env.GSHEET_ID,
-        getSheetName(),
+        GSHEET_ID,
+        await getCurrentSheetName(),
       )
       return true
     default:
@@ -64,7 +70,7 @@ async function handlePostRequests(data: PostDataParams) {
 }
 
 async function handleGetRequests(data: GetDataParams) {
-  await createSheetIfMissing(getSheetName())
+  await createSheetIfRequired()
   switch (data.function) {
     case 'fields':
       return getFields()
@@ -77,15 +83,19 @@ async function handleGetRequests(data: GetDataParams) {
 
       var rows = await getData(
         `${FIELDS_START}${rowNo + AREAS_START}:${rowNo + AREAS_START}`,
-        process.env.GSHEET_ID,
-        getSheetName(),
+        GSHEET_ID,
+        await getCurrentSheetName(),
       )
       return rows[0]
     case 'telegroup':
-      var rows = await getData('A3:B', process.env.GSHEET_ID, CONFIG_SHEET)
+      var rows = await getData('A3:B', GSHEET_ID, CONFIG_SHEET)
       var groupId = rows.filter((row) => row[0] == data.area)[0][1]
       return groupId
+    case 'generate':
+      await getCurrentSheetName()
+      return 'generated'
     default:
+      return 'default get request reached'
   }
 }
 
@@ -93,8 +103,8 @@ async function handleGetRequests(data: GetDataParams) {
 async function getAreas() {
   var rows = await getData(
     `A${AREAS_START}:A`,
-    process.env.GSHEET_ID,
-    getSheetName(),
+    GSHEET_ID,
+    await getCurrentSheetName(),
   )
   rows = rows.filter((row) => row[0] != null && row[0] != '')
   var areas = rows.map((row: Array<String>) => row[0])
@@ -110,29 +120,80 @@ async function getAreaRow(area: string) {
 async function getFields() {
   var rows = await getData(
     `${FIELDS_START}${FIELDS_ROW}:${FIELDS_ROW}`,
-    process.env.GSHEET_ID,
-    getSheetName(),
+    GSHEET_ID,
+    await getCurrentSheetName(),
   )
   rows = rows.filter((row) => row[0] != null && row[0] != '')
   return rows[0]
 }
 
-async function createSheetIfMissing(sheetName: string) {
-  var sheets = await getSheetNames(process.env.GSHEET_ID)
-  if (!sheets.includes(sheetName)) {
-    await duplicateSheet(
-      process.env.GSHEET_ID,
-      Number(process.env.TEMPLATE_SHEET_ID),
-      sheetName,
-    )
+async function createSheetIfRequired() {
+  let pastSheetData = (
+    await getData(PAST_SHEET_DATA_RANGE, GSHEET_ID, CONFIG_SHEET)
+  )[0]
+  let todayDate = new Date()
+  let lastCreatedDate = new Date(pastSheetData[0])
+  var dayInterval = Number(pastSheetData[2])
+  if (
+    pastSheetData[0] == '' ||
+    todayDate.getDate() - lastCreatedDate.getDate() >= dayInterval
+  ) {
+    await generateNewSheet()
+    return true
   }
+  return false
+}
+
+async function generateNewSheet() {
+  const todayDate = new Date()
+  let pastSheetData = (
+    await getData(PAST_SHEET_DATA_RANGE, GSHEET_ID, CONFIG_SHEET)
+  )[0]
+  let lastCreatedDate = new Date(pastSheetData[0])
+  var counter = Number(pastSheetData[1])
+  if (lastCreatedDate.getMonth() == todayDate.getMonth()) {
+    counter += 1
+  } else {
+    counter = 1
+  }
+
+  await duplicateSheet(
+    GSHEET_ID,
+    Number(process.env.TEMPLATE_SHEET_ID),
+    `${genSheetName()} [${counter}]`,
+  )
+  await updateNewSheetGeneratedDate()
+  await updateNewSheetCounter(counter)
+}
+
+async function updateNewSheetGeneratedDate() {
+  const todayDate = new Date()
+  await writeData(
+    NEW_SHEET_DATE_CELL,
+    todayDate.toString(),
+    GSHEET_ID,
+    CONFIG_SHEET,
+  )
+}
+
+async function updateNewSheetCounter(counter: number) {
+  await writeData(
+    NEW_SHEET_COUNTER_CELL,
+    counter.toString(),
+    GSHEET_ID,
+    CONFIG_SHEET,
+  )
 }
 
 // -- Abstracted Utils
-function getSheetName() {
+function genSheetName() {
   const todayDate = new Date()
   const todayMonth = todayDate.toLocaleString('default', { month: 'short' })
   const todayYear = todayDate.getFullYear()
-  const todaySession = todayDate.getDate() <= 17 ? 1 : 2
-  return `${todayMonth} ${todayYear} [${todaySession}]`
+  return `${todayMonth} ${todayYear}`
+}
+
+async function getCurrentSheetName() {
+  let sheetNames = await getSheetNames(GSHEET_ID)
+  return sheetNames[0]
 }
