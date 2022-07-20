@@ -92,7 +92,7 @@ async function handleGetRequests(data: GetDataParams) {
       var groupId = rows.filter((row) => row[0] == data.area)[0][1]
       return groupId
     case 'generate':
-      await getCurrentSheetName()
+      await generateNewSheet()
       return 'generated'
     default:
       return 'default get request reached'
