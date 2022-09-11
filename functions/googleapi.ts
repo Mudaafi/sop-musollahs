@@ -92,7 +92,10 @@ async function handleGetRequests(data: GetDataParams) {
       var groupId = rows.filter((row) => row[0] == data.area)[0][1]
       return groupId
     case 'generate':
-      await generateNewSheet()
+      var pastSheetData = (
+        await getData(PAST_SHEET_DATA_RANGE, GSHEET_ID, CONFIG_SHEET)
+      )[0]
+      await generateNewSheet(pastSheetData)
       return 'generated'
     default:
       return 'default get request reached'
@@ -134,21 +137,18 @@ async function createSheetIfRequired() {
   let todayDate = new Date()
   let lastCreatedDate = new Date(pastSheetData[0])
   var dayInterval = Number(pastSheetData[2])
-  if (
-    pastSheetData[0] == '' ||
-    todayDate.getDate() - lastCreatedDate.getDate() >= dayInterval
-  ) {
-    await generateNewSheet()
+  const diffTime = Math.abs(todayDate.getTime() - lastCreatedDate.getTime())
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  if (pastSheetData[0] == '' || diffDays >= dayInterval) {
+    await generateNewSheet(pastSheetData)
     return true
   }
   return false
 }
 
-async function generateNewSheet() {
+async function generateNewSheet(pastSheetData) {
   const todayDate = new Date()
-  let pastSheetData = (
-    await getData(PAST_SHEET_DATA_RANGE, GSHEET_ID, CONFIG_SHEET)
-  )[0]
+
   let lastCreatedDate = new Date(pastSheetData[0])
   var counter = Number(pastSheetData[1])
   if (lastCreatedDate.getMonth() == todayDate.getMonth()) {
