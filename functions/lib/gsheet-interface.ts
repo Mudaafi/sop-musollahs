@@ -217,15 +217,15 @@ export async function doBatchReq(
         if (error) {
           if (error.message.search('already exists') != -1) {
             console.log('Add Sheet API Name Overlap')
-            rej('Exists')
+            rej("Sheet Name Overlap Error: The sheet you're trying to create already exists. Try incrementing the counter in the config sheet and running the script again.")
           } else if (
             error.message.search('The caller does not have permission') != -1
           ) {
             console.log('GSheet Permission Error')
-            rej('Permissions')
+            rej('Permissions Error. The server is missing the required permissions to update this GSheet via the GSheet API.')
           } else {
             console.log('The add sheet API returned an error: ' + error)
-            rej(error)
+            rej(`GSheet Raw API Error: ${error}`)
           }
           return
         } else {
