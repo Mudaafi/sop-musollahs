@@ -70,7 +70,7 @@ async function handlePostRequests(data: PostDataParams) {
 }
 
 async function handleGetRequests(data: GetDataParams) {
-  await createSheetIfRequired()
+  const newSheetCreated = await createSheetIfRequired()
   switch (data.function) {
     case 'fields':
       return getFields()
@@ -92,6 +92,8 @@ async function handleGetRequests(data: GetDataParams) {
       var groupId = rows.filter((row) => row[0] == data.area)[0][1]
       return groupId
     case 'generate':
+      if (newSheetCreated) return 'generated'
+
       var pastSheetData = (
         await getData(PAST_SHEET_DATA_RANGE, GSHEET_ID, CONFIG_SHEET)
       )[0]
